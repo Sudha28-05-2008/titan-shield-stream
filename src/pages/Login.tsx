@@ -1,80 +1,99 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
-import { Shield, AlertCircle } from "lucide-react";
+import { Shield, Delete } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Login() {
   const { login, isAuthenticated } = useApp();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState(false);
+  const [shake, setShake] = useState(false);
 
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated) return <Navigate to="/home" replace />;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (login(email, password)) {
-      navigate("/dashboard");
-    } else {
-      setError("Invalid credentials. Access denied.");
+  const handleDigit = (digit: string) => {
+    if (pin.length >= 4) return;
+    const newPin = pin + digit;
+    setPin(newPin);
+    setError(false);
+
+    if (newPin.length === 4) {
+      setTimeout(() => {
+        if (login(newPin)) {
+          navigate("/home");
+        } else {
+          setError(true);
+          setShake(true);
+          setTimeout(() => { setPin(""); setShake(false); }, 500);
+        }
+      }, 300);
     }
   };
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4" style={{ background: "linear-gradient(135deg, hsl(222 47% 11%), hsl(220 40% 18%))" }}>
-      <div className="w-full max-w-md">
-        <div className="login-card">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary mb-4">
-              <Shield className="h-7 w-7 text-primary-foreground" />
-            </div>
-            <h1 className="text-2xl font-bold text-foreground">SecurePay</h1>
-            <p className="text-sm text-muted-foreground mt-1">Real-Time Fraud Detection Platform</p>
-          </div>
+  const handleDelete = () => {
+    setPin((p) => p.slice(0, -1));
+    setError(false);
+  };
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                {error}
-              </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="admin@securepay.com"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
-        <p className="text-center text-xs mt-6" style={{ color: "hsl(220 20% 55%)" }}>
-          Authorized personnel only. All activity is monitored.
+  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm text-center">
+        {/* Logo */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mb-10"
+        >
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary mb-4 shadow-lg">
+            <Shield className="h-8 w-8 text-primary-foreground" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">SecurePay</h1>
+          <p className="text-sm text-muted-foreground mt-1">Predictive Payment Security</p>
+        </motion.div>
+
+        {/* PIN dots */}
+        <motion.div
+          animate={shake ? { x: [-12, 12, -8, 8, -4, 4, 0] } : {}}
+          transition={{ duration: 0.4 }}
+          className="flex justify-center gap-4 mb-3"
+        >
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={`pin-dot ${i < pin.length ? "pin-dot-filled" : ""} ${error ? "border-destructive" : ""}`}
+            />
+          ))}
+        </motion.div>
+
+        <p className="text-xs text-muted-foreground mb-8">
+          {error ? "Incorrect PIN. Try again." : "Enter your 4-digit PIN"}
         </p>
+
+        {/* Keypad */}
+        <div className="grid grid-cols-3 gap-3 max-w-[240px] mx-auto">
+          {keys.map((key, i) => (
+            <div key={i} className="flex justify-center">
+              {key === "" ? (
+                <div className="h-16 w-16" />
+              ) : key === "del" ? (
+                <button onClick={handleDelete} className="keypad-btn text-muted-foreground">
+                  <Delete className="h-5 w-5" />
+                </button>
+              ) : (
+                <button onClick={() => handleDigit(key)} className="keypad-btn hover:bg-accent">
+                  {key}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-muted-foreground mt-10">Secure access required.</p>
       </div>
     </div>
   );

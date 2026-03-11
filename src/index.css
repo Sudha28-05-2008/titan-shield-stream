@@ -2,30 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 30% 12%;
+    --background: 210 20% 98%;
+    --foreground: 220 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 30% 12%;
+    --card-foreground: 220 25% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 12%;
+    --popover-foreground: 220 25% 10%;
 
-    --primary: 220 70% 50%;
+    --primary: 225 75% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 93%;
-    --secondary-foreground: 220 30% 20%;
+    --secondary: 220 15% 94%;
+    --secondary-foreground: 220 25% 18%;
 
-    --muted: 220 15% 93%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 220 60% 95%;
-    --accent-foreground: 220 70% 40%;
+    --accent: 225 60% 96%;
+    --accent-foreground: 225 70% 45%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
@@ -36,29 +36,23 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 220 15% 90%;
-    --input: 220 15% 90%;
-    --ring: 220 70% 50%;
+    --border: 220 15% 91%;
+    --input: 220 15% 91%;
+    --ring: 225 75% 55%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
-    --sidebar-bg: 222 47% 11%;
-    --sidebar-fg: 220 20% 80%;
-    --sidebar-active: 220 70% 50%;
-    --sidebar-hover: 222 40% 16%;
+    --nav-bg: 0 0% 100%;
+    --nav-border: 220 15% 91%;
+    --nav-active: 225 75% 55%;
 
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 220 20% 80%;
-    --sidebar-primary: 220 70% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 40% 16%;
-    --sidebar-accent-foreground: 220 20% 90%;
-    --sidebar-border: 222 30% 20%;
-    --sidebar-ring: 220 70% 50%;
+    --chart-success: 152 60% 42%;
+    --chart-failure: 0 72% 51%;
+    --chart-pending: 38 92% 50%;
 
-    --chart-approved: 152 60% 42%;
-    --chart-otp: 38 92% 50%;
-    --chart-blocked: 0 72% 51%;
+    --status-operational: 152 60% 42%;
+    --status-latency: 38 92% 50%;
+    --status-down: 0 72% 51%;
   }
 }
 
@@ -68,47 +62,57 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer utilities {
   .card-elevated {
-    @apply bg-card rounded-xl border shadow-sm;
+    @apply bg-card rounded-2xl border shadow-sm;
   }
   .metric-card {
-    @apply bg-card rounded-xl border p-5 shadow-sm transition-shadow hover:shadow-md;
+    @apply bg-card rounded-2xl border p-5 shadow-sm transition-all hover:shadow-md;
   }
-  .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors;
+  .pin-dot {
+    @apply h-4 w-4 rounded-full border-2 border-primary transition-all duration-200;
   }
-  .sidebar-link-active {
-    background: hsl(var(--sidebar-active));
-    color: hsl(var(--sidebar-primary-foreground));
+  .pin-dot-filled {
+    @apply bg-primary scale-110;
   }
-  .sidebar-link-inactive {
-    color: hsl(var(--sidebar-fg));
+  .keypad-btn {
+    @apply h-16 w-16 rounded-full text-xl font-semibold text-foreground transition-all
+           hover:bg-secondary active:scale-95 flex items-center justify-center;
   }
-  .sidebar-link-inactive:hover {
-    background: hsl(var(--sidebar-hover));
-    color: hsl(var(--sidebar-accent-foreground));
+  .nav-item {
+    @apply flex flex-col items-center gap-1 py-2 px-3 rounded-xl text-xs font-medium transition-colors;
   }
-  .status-approved {
+  .nav-item-active {
+    @apply text-primary;
+  }
+  .nav-item-inactive {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+  .status-success {
     @apply text-xs font-semibold px-2.5 py-1 rounded-full;
     background: hsl(var(--success) / 0.12);
     color: hsl(var(--success));
   }
-  .status-otp {
+  .status-warning {
     @apply text-xs font-semibold px-2.5 py-1 rounded-full;
     background: hsl(var(--warning) / 0.12);
     color: hsl(var(--warning));
   }
-  .status-blocked {
+  .status-danger {
     @apply text-xs font-semibold px-2.5 py-1 rounded-full;
     background: hsl(var(--destructive) / 0.12);
     color: hsl(var(--destructive));
   }
-  .login-card {
-    @apply bg-card rounded-2xl border shadow-xl p-8;
+
+  @keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
   }
 }

@@ -3,13 +3,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/context/AppContext";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Transactions from "./pages/Transactions";
-import FraudAlerts from "./pages/FraudAlerts";
+import Home from "./pages/Home";
+import Pay from "./pages/Pay";
+import TransactionHistory from "./pages/TransactionHistory";
 import RiskAnalytics from "./pages/RiskAnalytics";
-import Simulator from "./pages/Simulator";
-import SystemLogs from "./pages/SystemLogs";
-import DashboardLayout from "./components/DashboardLayout";
+import Settings from "./pages/Settings";
+import MobileLayout from "./components/MobileLayout";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -19,15 +18,14 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/fraud-alerts" element={<FraudAlerts />} />
-            <Route path="/risk-analytics" element={<RiskAnalytics />} />
-            <Route path="/simulator" element={<Simulator />} />
-            <Route path="/system-logs" element={<SystemLogs />} />
+          <Route element={<MobileLayout />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/pay" element={<Pay />} />
+            <Route path="/transaction-history" element={<TransactionHistory />} />
+            <Route path="/risk-analysis" element={<RiskAnalytics />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
